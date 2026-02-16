@@ -181,12 +181,12 @@
         try {
             await fetch(WEBHOOK_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Força o envio mesmo se o CORS do n8n falhar
+                mode: 'cors', // Força o envio mesmo se o CORS do n8n falhar
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
             
-            // Com 'no-cors' não conseguimos ler a resposta, então assumimos sucesso se não der erro de rede
+            // Com 'cors' não conseguimos ler a resposta, então assumimos sucesso se não der erro de rede
             alert("Avaliação Registrada!");
             location.reload();
         } catch (err) {
