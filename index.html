@@ -181,7 +181,7 @@
         try {
             await fetch(WEBHOOK_URL, {
                 method: 'POST',
-                mode: 'cors', // Força o envio mesmo se o CORS do n8n falhar
+                mode: 'no-cors', // Força o envio mesmo se o CORS do n8n falhar
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
