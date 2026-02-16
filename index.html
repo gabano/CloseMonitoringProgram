@@ -3,210 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avaliação Acadêmica - Mobile</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Avaliação de Desempenho Escolar</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        body { background-color: #f0f2f5; font-family: -apple-system, sans-serif; }
-        .card { border-radius: 20px; border: none; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-        .btn-subject { height: 55px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .step-hidden { display: none; }
-        /* Style for Likert buttons when selected */
-        .btn-check:checked + .btn-outline-primary {
-            background-color: #0d6efd !important;
-            color: white !important;
-            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+        :root {
+            --primary: #4a90e2;
+            --secondary: #f5f7fa;
+            --text: #333;
+            --accent: #6c5ce7;
+            --success: #00b894;
         }
-        .likert-container .btn { padding: 10px 0; font-weight: bold; }
-        .instruction-label { font-size: 0.85rem; color: #6c757d; margin-top: 4px; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        h2 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+
+        .section { display: none; animation: fadeIn 0.5s ease; }
+        .section.active { display: block; }
+
+        /* QR Scanner Style */
+        #reader { width: 100%; border-radius: 10px; overflow: hidden; }
+
+        /* Form Elements */
+        label { display: block; margin: 15px 0 5px; font-weight: 600; }
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        /* Likert Scale */
+        .likert {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px 0;
+        }
+        .likert-option {
+            text-align: center;
+            flex: 1;
+        }
+        .likert-option input { margin-bottom: 5px; cursor: pointer; }
+        .likert-label { font-size: 10px; color: #666; display: block; }
+
+        /* Checkboxes */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .checkbox-item { font-size: 14px; display: flex; align-items: center; }
+        .checkbox-item input { margin-right: 8px; }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: background 0.3s;
+        }
+
+        button:hover { background: var(--accent); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="container py-3">
-    <div class="card p-4">
-        
-        <div id="step-1">
-            <h5 class="text-center mb-3">1. Escanear QR Aluno</h5>
-            <div id="reader" style="width: 100%; border-radius: 12px; overflow: hidden; background: #000;"></div>
-            <div class="mt-3">
-                <label class="form-label small fw-bold">Selecionar Câmera:</label>
-                <select id="camera-select" class="form-select form-select-sm"></select>
+<div class="container">
+    <h2>Avaliação de Aluno</h2>
+
+    <div id="step-qr" class="section active">
+        <p style="text-align: center;">Aproxime o QR Code do aluno para iniciar.</p>
+        <div id="reader"></div>
+        <p id="qr-result" style="text-align:center; font-weight:bold; color:var(--success);"></p>
+    </div>
+
+    <div id="step-form" class="section">
+        <form id="evaluationForm">
+            <input type="hidden" id="QRID" name="QRID">
+
+            <label>Disciplina</label>
+            <select name="subject" required>
+                <option value="">Selecione...</option>
+                <option value="ELA">ELA</option>
+                <option value="MAT">MAT</option>
+                <option value="SCI">SCI</option>
+                <option value="GEO">GEO</option>
+                <option value="HIS">HIS</option>
+                <option value="POR">POR</option>
+                <option value="ART">ART</option>
+                <option value="PE">PE</option>
+                <option value="MAT.APLICADA">MAT.APLICADA</option>
+            </select>
+
+            <label>Q1. Realizou todas as tarefas propostas?</label>
+            <div class="likert">
+                <div class="likert-option"><input type="radio" name="q1" value="0" required><span class="likert-label">0<br>Não</span></div>
+                <div class="likert-option"><input type="radio" name="q1" value="1">1</div>
+                <div class="likert-option"><input type="radio" name="q1" value="2">2</div>
+                <div class="likert-option"><input type="radio" name="q1" value="3"><span class="likert-label">3<br>Às vezes</span></div>
+                <div class="likert-option"><input type="radio" name="q1" value="4">4</div>
+                <div class="likert-option"><input type="radio" name="q1" value="5"><span class="likert-label">5<br>Sempre</span></div>
             </div>
-        </div>
 
-        <div id="step-2" class="step-hidden">
-            <h5 class="text-center mb-4">2. Selecione a Disciplina</h5>
-            <div class="row g-2" id="subject-grid">
-                </div>
-            <button class="btn btn-link w-100 mt-3 text-muted" onclick="restart()">Reiniciar Scanner</button>
-        </div>
+            <label>Q2. Engajamento nas atividades?</label>
+            <div class="likert">
+                <div class="likert-option"><input type="radio" name="q2" value="0" required>0</div>
+                <div class="likert-option"><input type="radio" name="q2" value="1">1</div>
+                <div class="likert-option"><input type="radio" name="q2" value="2">2</div>
+                <div class="likert-option"><input type="radio" name="q2" value="3">3</div>
+                <div class="likert-option"><input type="radio" name="q2" value="4">4</div>
+                <div class="likert-option"><input type="radio" name="q2" value="5">5</div>
+            </div>
 
-        <div id="step-3" class="step-hidden">
-            <div class="alert alert-info py-2 small mb-4" id="display-info"></div>
-            
-            <form id="eval-form">
-                <div class="mb-4">
-                    <label class="form-label fw-bold">1. Cumpriu as tarefas de casa?</label>
-                    <div class="btn-group w-100 likert-container" role="group">
-                        <input type="radio" class="btn-check" name="q1" id="q1-0" value="0"><label class="btn btn-outline-primary" for="q1-0">0</label>
-                        <input type="radio" class="btn-check" name="q1" id="q1-1" value="1"><label class="btn btn-outline-primary" for="q1-1">1</label>
-                        <input type="radio" class="btn-check" name="q1" id="q1-2" value="2"><label class="btn btn-outline-primary" for="q1-2">2</label>
-                        <input type="radio" class="btn-check" name="q1" id="q1-3" value="3"><label class="btn btn-outline-primary" for="q1-3">3</label>
-                        <input type="radio" class="btn-check" name="q1" id="q1-4" value="4"><label class="btn btn-outline-primary" for="q1-4">4</label>
-                        <input type="radio" class="btn-check" name="q1" id="q1-5" value="5"><label class="btn btn-outline-primary" for="q1-5">5</label>
-                    </div>
-                    <div class="d-flex justify-content-between instruction-label px-1">
-                        <span>Nenhuma</span><span>Algumas</span><span>Todas</span>
-                    </div>
-                </div>
+            <label>Q3. Organização com materiais e caderno?</label>
+            <div class="likert">
+                <div class="likert-option"><input type="radio" name="q3" value="0" required>0</div>
+                <div class="likert-option"><input type="radio" name="q3" value="1">1</div>
+                <div class="likert-option"><input type="radio" name="q3" value="2">2</div>
+                <div class="likert-option"><input type="radio" name="q3" value="3">3</div>
+                <div class="likert-option"><input type="radio" name="q3" value="4">4</div>
+                <div class="likert-option"><input type="radio" name="q3" value="5">5</div>
+            </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold">2. Conversa e se distraiu em sala?</label>
-                    <div class="btn-group w-100 likert-container" role="group">
-                        <input type="radio" class="btn-check" name="q2" id="q2-0" value="0"><label class="btn btn-outline-primary" for="q2-0">0</label>
-                        <input type="radio" class="btn-check" name="q2" id="q2-1" value="1"><label class="btn btn-outline-primary" for="q2-1">1</label>
-                        <input type="radio" class="btn-check" name="q2" id="q2-2" value="2"><label class="btn btn-outline-primary" for="q2-2">2</label>
-                        <input type="radio" class="btn-check" name="q2" id="q2-3" value="3"><label class="btn btn-outline-primary" for="q2-3">3</label>
-                        <input type="radio" class="btn-check" name="q2" id="q2-4" value="4"><label class="btn btn-outline-primary" for="q2-4">4</label>
-                        <input type="radio" class="btn-check" name="q2" id="q2-5" value="5"><label class="btn btn-outline-primary" for="q2-5">5</label>
-                    </div>
-                    <div class="d-flex justify-content-between instruction-label px-1">
-                        <span>Nunca</span><span>Às vezes</span><span>Sempre</span>
-                    </div>
-                </div>
+            <label>Q4. Para progredir o aluno precisa melhorar:</label>
+            <div class="checkbox-grid">
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Pontualidade"> Pontualidade</div>
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Organização"> Organização</div>
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Foco"> Foco em sala</div>
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Participação"> Participação</div>
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Revisão"> Revisão</div>
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Interpretação"> Interpretação</div>
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Suporte"> Busca suporte</div>
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Tempo"> Gestão do tempo</div>
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Fundamentos"> Fundamentos</div>
+                <div class="checkbox-item"><input type="checkbox" name="improve" value="Registros"> Qualidade</div>
+            </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold">3. Conhecimento e domínio?</label>
-                    <div class="btn-group w-100 likert-container" role="group">
-                        <input type="radio" class="btn-check" name="q3" id="q3-0" value="0"><label class="btn btn-outline-primary" for="q3-0">0</label>
-                        <input type="radio" class="btn-check" name="q3" id="q3-1" value="1"><label class="btn btn-outline-primary" for="q3-1">1</label>
-                        <input type="radio" class="btn-check" name="q3" id="q3-2" value="2"><label class="btn btn-outline-primary" for="q3-2">2</label>
-                        <input type="radio" class="btn-check" name="q3" id="q3-3" value="3"><label class="btn btn-outline-primary" for="q3-3">3</label>
-                        <input type="radio" class="btn-check" name="q3" id="q3-4" value="4"><label class="btn btn-outline-primary" for="q3-4">4</label>
-                        <input type="radio" class="btn-check" name="q3" id="q3-5" value="5"><label class="btn btn-outline-primary" for="q3-5">5</label>
-                    </div>
-                    <div class="d-flex justify-content-between instruction-label px-1">
-                        <span>Nenhum</span><span>Regular</span><span>Total</span>
-                    </div>
-                </div>
+            <label>Q5. Observações:</label>
+            <textarea name="observations" rows="3"></textarea>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold">4. Para melhorar o aluno deve:</label>
-                    <div class="bg-light p-3 rounded-3">
-                        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" value="Diminuir conversa"> Diminuir conversa</div>
-                        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" value="Rever conteúdos"> Rever conteúdos em casa</div>
-                        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" value="Trabalhar organização"> Trabalhar organização</div>
-                        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" value="Entregas passadas"> Focar nas entregas passadas</div>
-                        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" value="Dentro do prazo"> Entregar atividades no prazo</div>
-                        <div class="form-check mb-2"><input class="form-check-input" type="checkbox" value="Registros caderno"> Melhorar registros no caderno</div>
-                        <div class="form-check"><input class="form-check-input" type="checkbox" value="Conteúdo semana"> Rever conteúdos da semana</div>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label fw-bold">5. Observations:</label>
-                    <textarea class="form-control" id="q5-obs" rows="3" placeholder="Additional notes..."></textarea>
-                </div>
-
-                <button type="button" onclick="submitData()" id="btn-submit" class="btn btn-success w-100 btn-lg shadow-sm">Finalizar e Enviar</button>
-            </form>
-        </div>
+            <button type="submit" id="submitBtn">Enviar Avaliação</button>
+        </form>
     </div>
 </div>
 
 <script>
-// Replace this with your Google Apps Script URL
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzc5O9npxt0GxRbU5a-tDhX2vnFFq8NVXw2wAHdFeHpL8-K2Q0JYYIUsV_ulp1Kn9Yayg/exec';
-
-const subjects = ['ELA', 'SCI', 'MATH', 'PORT', 'GEO', 'HIS', 'PE', 'MAT.AP', 'ART'];
-let formData = { studentId: '', subject: '' };
-let html5QrCode;
-
-// Generate Subject Grid
-const grid = document.getElementById('subject-grid');
-subjects.forEach(s => {
-    grid.innerHTML += `<div class="col-4"><button type="button" class="btn btn-outline-dark w-100 btn-subject" onclick="selectSubject('${s}')">${s}</button></div>`;
-});
-
-// Camera Initialization
-Html5Qrcode.getCameras().then(devices => {
-    const select = document.getElementById('camera-select');
-    if (devices && devices.length) {
-        devices.forEach((device, index) => {
-            const opt = document.createElement('option');
-            opt.value = device.id;
-            opt.text = device.label || `Camera ${index}`;
-            // Prioritize back camera
-            if (device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('traseira')) opt.selected = true;
-            select.appendChild(opt);
-        });
-        startScanner(select.value);
-        select.onchange = () => { html5QrCode.stop().then(() => startScanner(select.value)); };
-    }
-}).catch(err => alert("Camera Error: " + err));
-
-function startScanner(cameraId) {
-    html5QrCode = new Html5Qrcode("reader");
-    html5QrCode.start(cameraId, { fps: 10, qrbox: {width: 250, height: 250} }, (decodedText) => {
-        formData.studentId = decodedText;
-        nextStep(2);
-        html5QrCode.stop();
-    });
-}
-
-function nextStep(step) {
-    document.getElementById('step-1').classList.add('step-hidden');
-    document.getElementById('step-2').classList.add('step-hidden');
-    document.getElementById('step-3').classList.add('step-hidden');
-    document.getElementById(`step-${step}`).classList.remove('step-hidden');
-    window.scrollTo(0, 0);
-}
-
-function selectSubject(s) {
-    formData.subject = s;
-    document.getElementById('display-info').innerHTML = `<strong>ID:</strong> ${formData.studentId} | <strong>Matéria:</strong> ${s}`;
-    nextStep(3);
-}
-
-async function submitData() {
-    const btn = document.getElementById('btn-submit');
-    btn.disabled = true;
-    btn.innerText = "Enviando...";
-
-    const q4Checked = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+    const WEBHOOK_URL = 'https://n8n.srv1303523.hstgr.cloud/webhook/87110564-68b0-4510-834d-aada99d853e5';
     
-    const payload = {
-        studentId: formData.studentId,
-        subject: formData.subject,
-        q1: document.querySelector('input[name="q1"]:checked')?.value || "Not rated",
-        q2: document.querySelector('input[name="q2"]:checked')?.value || "Not rated",
-        q3: document.querySelector('input[name="q3"]:checked')?.value || "Not rated",
-        q4: q4Checked.join('; '),
-        q5: document.getElementById('q5-obs').value
-    };
-
-    try {
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            cache: 'no-cache',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
+    // QR Code Scanning Logic
+    function onScanSuccess(decodedText) {
+        document.getElementById('QRID').value = decodedText;
+        document.getElementById('qr-result').innerText = "QR Lido: " + decodedText;
         
-        alert("Enviado! Redirecionando para novo scanner.");
-        location.reload(); 
-    } catch (e) {
-        alert("Erro na conexão. Tente novamente.");
-        btn.disabled = false;
-        btn.innerText = "Finalizar e Enviar";
+        // Pause scanner and move to next step
+        html5QrcodeScanner.clear();
+        setTimeout(() => {
+            document.getElementById('step-qr').classList.remove('active');
+            document.getElementById('step-form').classList.add('active');
+        }, 1000);
     }
-}
 
-function restart() {
-    location.reload();
-}
+    let html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+
+    // Form Submission
+    document.getElementById('evaluationForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = 'Enviando...';
+
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Handle multiple checkboxes for Q4
+        data.improve = formData.getAll('improve');
+
+        try {
+            const response = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert('Avaliação enviada com sucesso!');
+                location.reload(); // Reset for next student
+            } else {
+                throw new Error('Erro ao enviar');
+            }
+        } catch (error) {
+            alert('Erro ao conectar com o servidor. Verifique sua conexão.');
+            btn.disabled = false;
+            btn.innerText = 'Enviar Avaliação';
+        }
+    });
 </script>
+
 </body>
 </html>
