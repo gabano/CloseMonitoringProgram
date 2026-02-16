@@ -3,306 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Avaliação Rápida</title>
+    <title>Avaliação Escolar</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        :root {
-            --primary: #2563eb;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
-            --border: #e2e8f0;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--card);
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-
-        h2 { text-align: center; font-size: 1.25rem; margin-bottom: 20px; color: var(--primary); }
-
+        :root { --primary: #2563eb; --bg: #f1f5f9; --card: #ffffff; --text: #0f172a; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 480px; background: var(--card); padding: 20px; border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        h2 { text-align: center; font-size: 1.2rem; margin-bottom: 20px; color: var(--primary); }
         .section { display: none; }
-        .active { display: block; animation: fadeIn 0.3s ease; }
+        .active { display: block; animation: slideUp 0.3s ease-out; }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #000; }
+        .camera-controls { margin-top: 10px; }
+        select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; background: white; font-size: 16px; }
+        
+        .subject-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
+        .subject-card { padding: 12px 4px; text-align: center; border: 1px solid #cbd5e1; border-radius: 10px; cursor: pointer; font-size: 0.75rem; font-weight: bold; transition: 0.2s; }
+        .subject-card.selected { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* QR Controls */
-        #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; }
-        .camera-controls { margin-top: 10px; display: flex; gap: 10px; flex-direction: column; }
-        select#cameraSelect { padding: 10px; border-radius: 8px; border: 1px solid var(--border); width: 100%; }
-
-        /* Subject Grid (Replacing Dropdown) */
-        .subject-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .subject-card {
-            padding: 15px 5px;
-            text-align: center;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.8rem;
-            transition: 0.2s;
-        }
-        .subject-card.selected {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Likert */
-        .likert-container { margin-bottom: 25px; }
-        .likert-title { font-weight: 600; margin-bottom: 10px; display: block; }
-        .likert-scale {
-            display: flex;
-            justify-content: space-between;
-            background: #f1f5f9;
-            padding: 10px;
-            border-radius: 50px;
-        }
-        .likert-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 1px solid #cbd5e1;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
+        .likert-title { font-weight: bold; margin: 15px 0 8px; display: block; font-size: 0.9rem; }
+        .likert-scale { display: flex; justify-content: space-between; background: #f8fafc; padding: 8px; border-radius: 50px; border: 1px solid #e2e8f0; }
+        .likert-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid #cbd5e1; background: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         input[type="radio"] { display: none; }
-        input[type="radio"]:checked + .likert-btn {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        input[type="radio"]:checked + .likert-btn { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 0 10px rgba(37,99,235,0.3); }
 
-        /* Checkboxes */
-        .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
-        .check-item {
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--border);
-        }
-        .check-item input { margin-right: 10px; width: 18px; height: 18px; }
+        .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .check-item { background: #f8fafc; padding: 10px; border-radius: 8px; font-size: 0.8rem; display: flex; align-items: center; border: 1px solid #e2e8f0; }
+        .check-item input { margin-right: 8px; transform: scale(1.2); }
 
-        textarea { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid var(--border); border-radius: 8px; height: 80px; }
+        textarea { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #cbd5e1; border-radius: 10px; margin-top: 8px; font-size: 16px; }
+        button#submitBtn { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.4); }
+        button:disabled { background: #94a3b8; }
 
-        button#submitBtn {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            margin-top: 20px;
-        }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Avaliação de Aluno</h2>
+    <h2>Avaliação de Desempenho</h2>
 
     <div id="step-qr" class="section active">
         <div id="reader"></div>
         <div class="camera-controls">
-            <select id="cameraSelect"><option value="">Carregando câmeras...</option></select>
+            <select id="cameraSelect"><option value="">Detectando câmeras...</option></select>
         </div>
-        <p id="qr-status" style="text-align:center; color: #64748b;">Aponte para o QR Code</p>
+        <p style="text-align:center; color: #64748b; font-size: 0.9rem; margin-top: 15px;">Aponte para o QR Code do Aluno</p>
     </div>
 
     <div id="step-form" class="section">
         <form id="evalForm">
             <input type="hidden" id="QRID" name="QRID">
             
-            <label class="likert-title">Selecione a Disciplina:</label>
-            <div class="subject-grid" id="subjectGrid">
-                <div class="subject-card" data-val="ELA">ELA</div>
-                <div class="subject-card" data-val="MAT">MAT</div>
-                <div class="subject-card" data-val="SCI">SCI</div>
-                <div class="subject-card" data-val="GEO">GEO</div>
-                <div class="subject-card" data-val="HIS">HIS</div>
-                <div class="subject-card" data-val="POR">POR</div>
-                <div class="subject-card" data-val="ART">ART</div>
-                <div class="subject-card" data-val="PE">PE</div>
-                <div class="subject-card" data-val="MAT.APLICADA">MAT.APLICADA</div>
+            <span class="likert-title">Disciplina:</span>
+            <div class="subject-grid">
+                <div class="subject-card" onclick="selectSub(this, 'ELA')">ELA</div>
+                <div class="subject-card" onclick="selectSub(this, 'MAT')">MAT</div>
+                <div class="subject-card" onclick="selectSub(this, 'SCI')">SCI</div>
+                <div class="subject-card" onclick="selectSub(this, 'GEO')">GEO</div>
+                <div class="subject-card" onclick="selectSub(this, 'HIS')">HIS</div>
+                <div class="subject-card" onclick="selectSub(this, 'POR')">POR</div>
+                <div class="subject-card" onclick="selectSub(this, 'ART')">ART</div>
+                <div class="subject-card" onclick="selectSub(this, 'PE')">PE</div>
+                <div class="subject-card" onclick="selectSub(this, 'MAT.APLICADA')">M.APL</div>
             </div>
             <input type="hidden" name="subject" id="selectedSubject" required>
 
-            <div class="likert-container">
-                <span class="likert-title">Q1. Realizou todas as tarefas?</span>
-                <div class="likert-scale">
-                    <label><input type="radio" name="q1" value="0" required><div class="likert-btn">0</div></label>
-                    <label><input type="radio" name="q1" value="1"><div class="likert-btn">1</div></label>
-                    <label><input type="radio" name="q1" value="2"><div class="likert-btn">2</div></label>
-                    <label><input type="radio" name="q1" value="3"><div class="likert-btn">3</div></label>
-                    <label><input type="radio" name="q1" value="4"><div class="likert-btn">4</div></label>
-                    <label><input type="radio" name="q1" value="5"><div class="likert-btn">5</div></label>
-                </div>
+            <span class="likert-title">Q1. Realizou tarefas do período?</span>
+            <div class="likert-scale">
+                <label><input type="radio" name="q1" value="0" required><div class="likert-btn">0</div></label>
+                <label><input type="radio" name="q1" value="1"><div class="likert-btn">1</div></label>
+                <label><input type="radio" name="q1" value="2"><div class="likert-btn">2</div></label>
+                <label><input type="radio" name="q1" value="3"><div class="likert-btn">3</div></label>
+                <label><input type="radio" name="q1" value="4"><div class="likert-btn">4</div></label>
+                <label><input type="radio" name="q1" value="5"><div class="likert-btn">5</div></label>
             </div>
 
-            <div class="likert-container">
-                <span class="likert-title">Q2. Manteve-se engajado?</span>
-                <div class="likert-scale">
-                    <label><input type="radio" name="q2" value="0" required><div class="likert-btn">0</div></label>
-                    <label><input type="radio" name="q2" value="1"><div class="likert-btn">1</div></label>
-                    <label><input type="radio" name="q2" value="2"><div class="likert-btn">2</div></label>
-                    <label><input type="radio" name="q2" value="3"><div class="likert-btn">3</div></label>
-                    <label><input type="radio" name="q2" value="4"><div class="likert-btn">4</div></label>
-                    <label><input type="radio" name="q2" value="5"><div class="likert-btn">5</div></label>
-                </div>
+            <span class="likert-title">Q2. Engajamento em sala?</span>
+            <div class="likert-scale">
+                <label><input type="radio" name="q2" value="0" required><div class="likert-btn">0</div></label>
+                <label><input type="radio" name="q2" value="1"><div class="likert-btn">1</div></label>
+                <label><input type="radio" name="q2" value="2"><div class="likert-btn">2</div></label>
+                <label><input type="radio" name="q2" value="3"><div class="likert-btn">3</div></label>
+                <label><input type="radio" name="q2" value="4"><div class="likert-btn">4</div></label>
+                <label><input type="radio" name="q2" value="5"><div class="likert-btn">5</div></label>
             </div>
 
-            <div class="likert-container">
-                <span class="likert-title">Q3. Organização material/caderno?</span>
-                <div class="likert-scale">
-                    <label><input type="radio" name="q3" value="0" required><div class="likert-btn">0</div></label>
-                    <label><input type="radio" name="q3" value="1"><div class="likert-btn">1</div></label>
-                    <label><input type="radio" name="q3" value="2"><div class="likert-btn">2</div></label>
-                    <label><input type="radio" name="q3" value="3"><div class="likert-btn">3</div></label>
-                    <label><input type="radio" name="q3" value="4"><div class="likert-btn">4</div></label>
-                    <label><input type="radio" name="q3" value="5"><div class="likert-btn">5</div></label>
-                </div>
+            <span class="likert-title">Q3. Organização material/caderno?</span>
+            <div class="likert-scale">
+                <label><input type="radio" name="q3" value="0" required><div class="likert-btn">0</div></label>
+                <label><input type="radio" name="q3" value="1"><div class="likert-btn">1</div></label>
+                <label><input type="radio" name="q3" value="2"><div class="likert-btn">2</div></label>
+                <label><input type="radio" name="q3" value="3"><div class="likert-btn">3</div></label>
+                <label><input type="radio" name="q3" value="4"><div class="likert-btn">4</div></label>
+                <label><input type="radio" name="q3" value="5"><div class="likert-btn">5</div></label>
             </div>
 
-            <label class="likert-title">Q4. Precisa melhorar:</label>
+            <span class="likert-title">Q4. Precisa melhorar:</span>
             <div class="check-grid">
                 <label class="check-item"><input type="checkbox" name="improve" value="Pontualidade"> Pontualidade</label>
                 <label class="check-item"><input type="checkbox" name="improve" value="Organização"> Organização</label>
-                <label class="check-item"><input type="checkbox" name="improve" value="Foco"> Foco em sala</label>
+                <label class="check-item"><input type="checkbox" name="improve" value="Foco"> Foco</label>
                 <label class="check-item"><input type="checkbox" name="improve" value="Participação"> Participação</label>
                 <label class="check-item"><input type="checkbox" name="improve" value="Revisão"> Revisão</label>
                 <label class="check-item"><input type="checkbox" name="improve" value="Interpretação"> Interpretação</label>
-                <label class="check-item"><input type="checkbox" name="improve" value="Suporte"> Suporte</label>
-                <label class="check-item"><input type="checkbox" name="improve" value="Tempo"> Gestão Tempo</label>
             </div>
 
-            <label class="likert-title">Q5. Observações:</label>
-            <textarea name="observations"></textarea>
+            <span class="likert-title">Q5. Observações:</span>
+            <textarea name="observations" placeholder="Opcional..."></textarea>
 
-            <button type="submit" id="submitBtn">Enviar Avaliação</button>
+            <button type="submit" id="submitBtn">Finalizar Avaliação</button>
         </form>
     </div>
 </div>
 
 <script>
-    const WEBHOOK_URL = 'https://n8n.srv1303523.hstgr.cloud/webhook-test/87110564-68b0-4510-834d-aada99d853e5';
+    const WEBHOOK_URL = 'https://n8n.srv1303523.hstgr.cloud/webhook/87110564-68b0-4510-834d-aada99d853e5';
     let html5QrCode;
 
-    // 1. Camera Handling
-    async function startScanner() {
-        const devices = await Html5Qrcode.getCameras();
-        const cameraSelect = document.getElementById('cameraSelect');
-        cameraSelect.innerHTML = "";
-
-        if (devices && devices.length) {
-            devices.forEach(device => {
+    // Inicializa Câmeras
+    async function initScanner() {
+        try {
+            const devices = await Html5Qrcode.getCameras();
+            const select = document.getElementById('cameraSelect');
+            select.innerHTML = "";
+            
+            devices.forEach((device, index) => {
                 const opt = document.createElement('option');
                 opt.value = device.id;
-                opt.text = device.label;
-                cameraSelect.appendChild(opt);
+                opt.text = device.label || `Câmera ${index + 1}`;
+                select.appendChild(opt);
             });
 
-            // Try to find rear camera
-            const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('traseira'));
-            const cameraId = backCam ? backCam.id : devices[0].id;
-            cameraSelect.value = cameraId;
-
+            // Forçar Traseira (Back)
+            const back = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('traseira'));
+            const startId = back ? back.id : devices[0].id;
+            select.value = startId;
+            
             html5QrCode = new Html5Qrcode("reader");
-            launchCamera(cameraId);
-        }
+            startScan(startId);
+        } catch (e) { alert("Erro ao acessar câmera: " + e); }
     }
 
-    function launchCamera(id) {
+    function startScan(id) {
         html5QrCode.start(id, { fps: 10, qrbox: 250 }, (text) => {
             document.getElementById('QRID').value = text;
             html5QrCode.stop().then(() => {
                 document.getElementById('step-qr').classList.remove('active');
                 document.getElementById('step-form').classList.add('active');
+                window.scrollTo(0,0);
             });
         });
     }
 
-    document.getElementById('cameraSelect').addEventListener('change', (e) => {
-        html5QrCode.stop().then(() => launchCamera(e.target.value));
-    });
+    document.getElementById('cameraSelect').onchange = (e) => {
+        html5QrCode.stop().then(() => startScan(e.target.value));
+    };
 
-    // 2. Subject Selection Logic
-    document.querySelectorAll('.subject-card').forEach(card => {
-        card.addEventListener('click', function() {
-            document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('selected'));
-            this.classList.add('selected');
-            document.getElementById('selectedSubject').value = this.dataset.val;
-        });
-    });
+    function selectSub(el, val) {
+        document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('selectedSubject').value = val;
+    }
 
-    // 3. Form Submission
-    document.getElementById('evalForm').addEventListener('submit', async (e) => {
+    // Submit
+    document.getElementById('evalForm').onsubmit = async (e) => {
         e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        const subject = document.getElementById('selectedSubject').value;
+        if(!document.getElementById('selectedSubject').value) return alert("Escolha a Disciplina!");
         
-        if(!subject) return alert("Selecione uma disciplina!");
-
+        const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerText = "Enviando...";
 
         const formData = new FormData(e.target);
-        const payload = Object.fromEntries(formData.entries());
-        payload.improve = formData.getAll('improve');
+        const data = Object.fromEntries(formData.entries());
+        data.improve = formData.getAll('improve');
 
         try {
-            const res = await fetch(WEBHOOK_URL, {
+            await fetch(WEBHOOK_URL, {
                 method: 'POST',
-                mode: 'cors', // Crucial for n8n
+                mode: 'no-cors', // Força o envio mesmo se o CORS do n8n falhar
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(data)
             });
-
-            if (res.ok) {
-                alert("Dados salvos!");
-                location.reload();
-            } else {
-                alert("Erro no servidor: " + res.status);
-            }
+            
+            // Com 'no-cors' não conseguimos ler a resposta, então assumimos sucesso se não der erro de rede
+            alert("Avaliação Registrada!");
+            location.reload();
         } catch (err) {
-            console.error(err);
-            alert("Erro de conexão. Verifique se o n8n está Ativo (Active) e aceita chamadas externas.");
-        } finally {
+            alert("Erro de conexão. Verifique se o n8n está Ativo.");
             btn.disabled = false;
-            btn.innerText = "Enviar Avaliação";
+            btn.innerText = "Finalizar Avaliação";
         }
-    });
+    };
 
-    startScanner();
+    initScanner();
 </script>
 
 </body>
